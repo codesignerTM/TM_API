@@ -1,7 +1,19 @@
-import userController from "../controllers/auth";
+import userController from "../controllers/users";
 
-module.exports = function(app) {
-  app.get("/users", function(req, res, next) {
-    res.send("users");
+export default app => {
+  app.post("/users", async function(req, res, next) {
+    await userController.createUser(req, res);
+  });
+
+  app.put("/users/:id", async function(req, res, next) {
+    await userController.updateUser(req, res);
+  });
+
+  app.get("/users", async function(req, res, next) {
+    await userController.listAllUsers(req, res);
+  });
+
+  app.get("/users/:id", async function(req, res, next) {
+    await authController.getUserInfo(req, res);
   });
 };

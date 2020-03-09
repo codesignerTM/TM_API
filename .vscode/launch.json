@@ -5,12 +5,12 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Program",
-      "program": "${workspaceRoot}/src/bin/www",
+      "program": "${workspaceRoot}/api/bin/www",
       "stopOnEntry": false,
       "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/babel-node",
       "runtimeArgs": ["--nolazy"],
-      "sourceMaps": false
-      //"envFile": "${workspaceFolder}/.env",
+      "sourceMaps": false,
+      "envFile": "${workspaceFolder}/.env"
     },
     {
       "name": "Attach",

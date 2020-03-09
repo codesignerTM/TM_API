@@ -1,7 +1,7 @@
 import authController from "../controllers/auth";
 
-module.exports = function(app) {
-  app.get("/hello", function(req, res, next) {
-    res.send("hello");
+export default app => {
+  app.get("/hello", async function(req, res, next) {
+    await authController.signUp(req, res);
   });
 };

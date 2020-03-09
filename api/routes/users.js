@@ -1,8 +1,7 @@
-import express from "express";
-const router = express.Router();
+import userController from "../controllers/auth";
 
-router.get("/", function(req, res, next) {
-  res.send("respond with a resource");
-});
-
-export default router;
+module.exports = function(app) {
+  app.get("/users", function(req, res, next) {
+    res.send("users");
+  });
+};

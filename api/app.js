@@ -3,7 +3,7 @@ import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
 
-import indexRouter from "./routes/index";
+import routes from "./routes/RegisterRoutes";
 
 const app = express();
 
@@ -13,6 +13,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "../public")));
 
-app.use("/", indexRouter);
+//register routes
+routes.register(app);
 
 export default app;

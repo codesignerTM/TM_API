@@ -1,7 +1,23 @@
-import userController from "../controllers/auth";
+import taskController from "../controllers/task";
 
-module.exports = function(app) {
-  app.get("/users", function(req, res, next) {
-    res.send("users");
+export default app => {
+  app.post("/users/:user_id/tasks", async function(req, res, next) {
+    await taskController.createTask(req, res);
+  });
+
+  app.put("/users/:user_id}/tasks/:task_id", async function(req, res, next) {
+    await taskController.updateTask(req, res);
+  });
+
+  app.delete("/users/:user_id/tasks/:task_id", async function(req, res, next) {
+    await taskController.deleteTask(req, res);
+  });
+
+  app.get("/users/:user_id/tasks/:task_id", async function(req, res, next) {
+    await taskController.getTask(req, res);
+  });
+
+  app.get("/users/:user_id/tasks", async function(req, res, next) {
+    await taskController.getAllTask(req, res);
   });
 };

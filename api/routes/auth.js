@@ -1,7 +1,15 @@
 import authController from "../controllers/auth";
 
 export default app => {
-  app.get("/hello", async function(req, res, next) {
+  app.post("/signup", async function(req, res, next) {
     await authController.signUp(req, res);
+  });
+
+  app.post("/login", async function(req, res, next) {
+    await authController.logIn(req, res);
+  });
+
+  app.post("/resetPwd", async function(req, res, next) {
+    await authController.resetPassword(req, res);
   });
 };

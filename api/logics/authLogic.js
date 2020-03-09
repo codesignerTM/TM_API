@@ -1,12 +1,20 @@
+import dataResponse from "../models/DataResponse";
+
 class AuthLogic {
   static async signUp(req) {
-    console.log("req", req);
-    return;
+    return new dataResponse(dataResponse.dataResponseType.SUCCESS, "signUp");
   }
 
-  static async logIn(req) {}
+  static async logIn(req) {
+    return new dataResponse(dataResponse.dataResponseType.SUCCESS, "logIn");
+  }
 
-  static async resetPassword(req) {}
+  static async resetPassword(req) {
+    return new dataResponse(
+      dataResponse.dataResponseType.SUCCESS,
+      "resetPassword"
+    );
+  }
 }
 
 export default AuthLogic;

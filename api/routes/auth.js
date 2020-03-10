@@ -9,7 +9,7 @@ export default app => {
     await authController.logIn(req, res);
   });
 
-  app.post("/resetPwd", async function(req, res, next) {
+  app.post("/resetpwd", async function(req, res, next) {
     await authController.resetPassword(req, res);
   });
 };

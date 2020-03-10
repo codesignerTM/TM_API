@@ -3,6 +3,8 @@ import AppUser from "../models/AppUser";
 import bcrypt from "bcrypt";
 import moment from "moment";
 import jwt from "jsonwebtoken";
+import EmailHelper from "../helpers/EmailHelper";
+import RandomCharGenerator from "../helpers/RandomCharGen";
 
 class AuthLogic {
   static async signUp(req) {
@@ -59,7 +61,6 @@ class AuthLogic {
   static async logIn(req) {
     try {
       let appUser = await AppUser.find({ userEmail: req.body.email });
-      console.log("appUser", appUser);
 
       if (appUser.length === 0)
         return new dataResponse(
@@ -68,10 +69,8 @@ class AuthLogic {
         );
 
       let password = appUser[0].userPassword;
-      console.log("password", password);
 
       let comparaPWD = bcrypt.compareSync(req.body.password, password);
-      console.log("comparaPWD", comparaPWD);
 
       if (!comparaPWD)
         return new dataResponse(
@@ -100,10 +99,51 @@ class AuthLogic {
   }
 
   static async resetPassword(req) {
-    return new dataResponse(
-      dataResponse.dataResponseType.SUCCESS,
-      "resetPassword"
-    );
+    try {
+      let email = req.body.email || false;
+      console.log("appUser", appUser);
+
+      if (!email) return new dataResponse(dataResponse.dataResponseType.FAILED);
+
+      let appUser = await AppUser.find({ userEmail: req.body.email });
+      console.log("appUser", appUser);
+
+      if (appUser.length === 0)
+        return new dataResponse(
+          dataResponse.dataResponseType.INVALID,
+          "Authentication failed!"
+        );
+
+      const saltRounds = 10;
+      const salt = bcrypt.genSaltSync(saltRounds);
+      let newPassword = await RandomCharGenerator.RandomCharGenerator(6);
+      let newHashedPassword = bcrypt.hashSync(newPassword, salt);
+
+      await AppUser.findOneAndUpdate(
+        { _id: appUser._id },
+        { userPassword: newHashedPassword },
+        { new: true }
+      );
+
+      await this.sendPasswordResetEmail(appUser, newPassword);
+
+      return new dataResponse(
+        dataResponse.dataResponseType.SUCCESS,
+        "Password Reset email sent!"
+      );
+    } catch (error) {
+      console.log(error, "error during password reset");
+      return new dataResponse(
+        dataResponse.dataResponseType.FAILED,
+        "password reset unsuccessful"
+      );
+    }
+  }
+
+  static async sendPasswordResetEmail(appUser, newPassword) {
+    let emailHelper = new EmailHelper();
+
+    return await emailHelper.sendEmail();
   }
 }
 

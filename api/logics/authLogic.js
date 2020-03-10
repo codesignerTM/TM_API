@@ -57,7 +57,46 @@ class AuthLogic {
   }
 
   static async logIn(req) {
-    return new dataResponse(dataResponse.dataResponseType.SUCCESS, "logIn");
+    try {
+      let appUser = await AppUser.find({ userEmail: req.body.email });
+      console.log("appUser", appUser);
+
+      if (appUser.length === 0)
+        return new dataResponse(
+          dataResponse.dataResponseType.INVALID,
+          "Authentication failed!"
+        );
+
+      let password = appUser[0].userPassword;
+      console.log("password", password);
+
+      let comparaPWD = bcrypt.compareSync(req.body.password, password);
+      console.log("comparaPWD", comparaPWD);
+
+      if (!comparaPWD)
+        return new dataResponse(
+          dataResponse.dataResponseType.INVALID,
+          "Authentication failed!"
+        );
+
+      let userData = {
+        userName: appUser.fullName,
+        userEmail: appUser.email
+      };
+
+      let userResposeData = await this.createUserToken(userData);
+
+      return new dataResponse(
+        dataResponse.dataResponseType.SUCCESS,
+        userResposeData
+      );
+    } catch (error) {
+      console.log(error, "error during login");
+      return new dataResponse(
+        dataResponse.dataResponseType.FAILED,
+        "login unsuccessful"
+      );
+    }
   }
 
   static async resetPassword(req) {

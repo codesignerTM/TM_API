@@ -5,7 +5,7 @@ export default app => {
     await taskController.createTask(req, res);
   });
 
-  app.put("/users/:user_id}/tasks/:task_id", async function(req, res, next) {
+  app.put("/users/:user_id/tasks/:task_id", async function(req, res, next) {
     await taskController.updateTask(req, res);
   });
 

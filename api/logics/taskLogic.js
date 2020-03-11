@@ -1,6 +1,7 @@
 import dataResponse from "../models/DataResponse";
 import User from "../models/CreatedUser";
 import nanoid from "nanoid";
+
 class TaskLogic {
   static async createTaskForUser(req) {
     let userId = req.params.id;
@@ -25,13 +26,7 @@ class TaskLogic {
 
       taskArray.push(taskData);
 
-      let updatedUser = await User.findOneAndUpdate(
-        { _id: userId },
-        { tasks: taskArray },
-        {
-          useFindAndModify: false
-        }
-      );
+      let updatedUser = await this.updateUserWithTask(userId, taskArray);
 
       return new dataResponse(
         dataResponse.dataResponseType.SUCCESS,
@@ -47,10 +42,58 @@ class TaskLogic {
   }
 
   static async updateTask(req) {
-    return new dataResponse(
-      dataResponse.dataResponseType.SUCCESS,
-      "updateTask"
-    );
+    let userId = req.params.user_id;
+    let taskId = req.params.task_id;
+
+    if (!userId || !taskId) {
+      return new dataResponse(
+        dataResponse.dataResponseType.FAILED,
+        "cannot perform operation"
+      );
+    }
+
+    try {
+      let user = await User.findById({ _id: userId });
+
+      let taskArray = user.tasks;
+      taskArray.map(task => {
+        if (task.taskId === taskId) {
+          task.name = req.body.name;
+        }
+        return task;
+      });
+
+      let updatedUser = await this.updateUserWithTask(userId, taskArray);
+
+      return new dataResponse(
+        dataResponse.dataResponseType.SUCCESS,
+        "Task updated"
+      );
+    } catch (error) {
+      console.log(error, "error during task update");
+      return new dataResponse(
+        dataResponse.dataResponseType.FAILED,
+        "error during task update"
+      );
+    }
+  }
+
+  static async updateUserWithTask(userId, taskArray) {
+    try {
+      let updatedUser = await User.findOneAndUpdate(
+        { _id: userId },
+        { tasks: taskArray },
+        {
+          useFindAndModify: false
+        }
+      );
+      console.log(updatedUser, "updatedUser");
+
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
   }
 
   static async deleteTask(req) {

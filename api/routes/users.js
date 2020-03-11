@@ -14,6 +14,6 @@ export default app => {
   });
 
   app.get("/users/:id", async function(req, res, next) {
-    await authController.getUserInfo(req, res);
+    await userController.getUserInfo(req, res);
   });
 };

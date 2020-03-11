@@ -96,6 +96,22 @@ class TaskLogic {
   }
 
   static async deleteTask(req) {
+    let userId = req.params.user_id;
+    let taskId = req.params.task_id;
+
+    try {
+      let user = await User.findById({ _id: userId });
+      let tasksByUser = user.tasks;
+      let tasksArray = tasksByUser.filter(task => task.taskId !== taskId);
+      console.log(tasksArray, "tasksArray");
+
+      let updatedUser = await this.updateUserWithTask(userId, tasksArray);
+
+      return new dataResponse(
+        dataResponse.dataResponseType.SUCCESS,
+        "Task deleted"
+      );
+    } catch (error) {}
     return new dataResponse(
       dataResponse.dataResponseType.SUCCESS,
       "deleteTask"

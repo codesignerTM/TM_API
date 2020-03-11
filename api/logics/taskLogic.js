@@ -103,7 +103,22 @@ class TaskLogic {
   }
 
   static async getTask(req) {
-    return new dataResponse(dataResponse.dataResponseType.SUCCESS, "getTask");
+    let userId = req.params.user_id;
+    let taskId = req.params.task_id;
+
+    try {
+      let user = await User.findById({ _id: userId });
+      let tasksByUser = user.tasks;
+      let task = tasksByUser.find(task => task.taskId === taskId);
+
+      return new dataResponse(dataResponse.dataResponseType.SUCCESS, task);
+    } catch (error) {
+      console.log(error, "error during loading task");
+      return new dataResponse(
+        dataResponse.dataResponseType.FAILED,
+        "error during loading task"
+      );
+    }
   }
 
   static async getAllTask(req) {

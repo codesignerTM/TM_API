@@ -20,4 +20,9 @@ export default app => {
   app.get("/users/:user_id/tasks", async function(req, res, next) {
     await taskController.getAllTask(req, res);
   });
+
+  //testing route for cronjob
+  app.get("/task/cronjob", async function(req, res, next) {
+    await taskController.cronjob(req, res);
+  });
 };

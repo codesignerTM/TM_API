@@ -87,7 +87,6 @@ class TaskLogic {
           useFindAndModify: false
         }
       );
-      console.log(updatedUser, "updatedUser");
 
       return true;
     } catch (error) {
@@ -108,10 +107,21 @@ class TaskLogic {
   }
 
   static async getAllTask(req) {
-    return new dataResponse(
-      dataResponse.dataResponseType.SUCCESS,
-      "getAllTask"
-    );
+    let id = req.params.user_id;
+    try {
+      let user = await User.findById({ _id: id });
+
+      return new dataResponse(
+        dataResponse.dataResponseType.SUCCESS,
+        user.tasks
+      );
+    } catch (error) {
+      console.log(error, "error during loading user tasks");
+      return new dataResponse(
+        dataResponse.dataResponseType.FAILED,
+        "error during loading user task"
+      );
+    }
   }
 }
 

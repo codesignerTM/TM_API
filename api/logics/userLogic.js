@@ -34,7 +34,9 @@ class UserLogic {
       let userToUpdate = await User.findOneAndUpdate(
         { _id: id },
         { first_name: req.body.first_name, last_name: req.body.last_name },
-        { new: true }
+        {
+          useFindAndModify: false
+        }
       );
 
       return new dataResponse(

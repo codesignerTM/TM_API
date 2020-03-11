@@ -1,6 +1,6 @@
 import dataResponse from "../models/DataResponse";
 import User from "../models/CreatedUser";
-import mongoose from "mongoose";
+import nanoid from "nanoid";
 class TaskLogic {
   static async createTaskForUser(req) {
     let userId = req.params.id;
@@ -20,7 +20,7 @@ class TaskLogic {
         name: req.body.name,
         description: req.body.description,
         date_time: req.body.date_time,
-        taskId: (taskArray.length + 1).toString()
+        taskId: nanoid()
       };
 
       taskArray.push(taskData);

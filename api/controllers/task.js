@@ -30,10 +30,17 @@ const getAllTask = async (req, res) => {
   return;
 };
 
+const cronjob = async (req, res) => {
+  let response = await taskLogic.resetTaskStatus(req);
+  res.json(response);
+  return;
+};
+
 export default {
   createTask,
   updateTask,
   deleteTask,
   getTask,
-  getAllTask
+  getAllTask,
+  cronjob
 };

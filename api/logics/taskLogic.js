@@ -1,6 +1,7 @@
 import dataResponse from "../models/DataResponse";
 import User from "../models/CreatedUser";
 import nanoid from "nanoid";
+import moment from "moment";
 
 class TaskLogic {
   static async createTaskForUser(req) {
@@ -16,11 +17,14 @@ class TaskLogic {
       }
 
       let taskArray = user.tasks;
+      let defaultStatus = "pending";
 
       let taskData = {
         name: req.body.name,
+        status: defaultStatus,
         description: req.body.description,
         date_time: req.body.date_time,
+        deadline: req.body.deadline,
         taskId: nanoid()
       };
 
@@ -126,13 +130,16 @@ class TaskLogic {
       let user = await User.findById({ _id: userId });
       let tasksByUser = user.tasks;
       let task = tasksByUser.find(task => task.taskId === taskId);
-
-      return new dataResponse(dataResponse.dataResponseType.SUCCESS, task);
+      if (task) {
+        return new dataResponse(dataResponse.dataResponseType.SUCCESS, task);
+      } else {
+        throw new Error();
+      }
     } catch (error) {
       console.log(error, "error during loading task");
       return new dataResponse(
         dataResponse.dataResponseType.FAILED,
-        "error during loading task"
+        "task not found"
       );
     }
   }
@@ -152,6 +159,30 @@ class TaskLogic {
         dataResponse.dataResponseType.FAILED,
         "error during loading user task"
       );
+    }
+  }
+
+  static async resetTaskStatus() {
+    //Setup a scheduled job to check all tasks in the Database - those that have a status of "pending" and next_execute_date_time has passed -
+    //print it to the console and update the task to "done".
+
+    let allUsers = await User.find();
+    let now = moment();
+    console.log("now", now);
+    let pendingStatus = "pending";
+
+    let tasksToUpdate = [];
+    for (let key in allUsers) {
+      let userTasks = allUsers[key].tasks;
+      console.log("userTasks", userTasks);
+      userTasks.map(task => {
+        if (task.status === pendingStatus && moment(task.deadline) < now) {
+          console.log("task.deadline", moment(task.deadline));
+          task.status = "done";
+        }
+        console.log("task", task);
+        return task;
+      });
     }
   }
 }

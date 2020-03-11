@@ -1,7 +1,7 @@
 import taskController from "../controllers/task";
 
 export default app => {
-  app.post("/users/:user_id/tasks", async function(req, res, next) {
+  app.post("/users/:id/tasks", async function(req, res, next) {
     await taskController.createTask(req, res);
   });
 

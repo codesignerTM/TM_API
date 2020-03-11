@@ -1,7 +1,7 @@
 import taskLogic from "../logics/taskLogic";
 
 const createTask = async (req, res) => {
-  let response = await taskLogic.createTask(req);
+  let response = await taskLogic.createTaskForUser(req);
   res.json(response);
   return;
 };

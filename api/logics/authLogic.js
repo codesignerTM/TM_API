@@ -101,12 +101,10 @@ class AuthLogic {
   static async resetPassword(req) {
     try {
       let email = req.body.email || false;
-      console.log("appUser", appUser);
 
       if (!email) return new dataResponse(dataResponse.dataResponseType.FAILED);
 
       let appUser = await AppUser.find({ userEmail: req.body.email });
-      console.log("appUser", appUser);
 
       if (appUser.length === 0)
         return new dataResponse(
@@ -120,16 +118,17 @@ class AuthLogic {
       let newHashedPassword = bcrypt.hashSync(newPassword, salt);
 
       await AppUser.findOneAndUpdate(
-        { _id: appUser._id },
+        { _id: appUser[0]._id },
         { userPassword: newHashedPassword },
-        { new: true }
+        {
+          useFindAndModify: false
+        }
       );
 
       await this.sendPasswordResetEmail(appUser, newPassword);
-
       return new dataResponse(
         dataResponse.dataResponseType.SUCCESS,
-        "Password Reset email sent!"
+        "password reset email sent"
       );
     } catch (error) {
       console.log(error, "error during password reset");
@@ -141,9 +140,35 @@ class AuthLogic {
   }
 
   static async sendPasswordResetEmail(appUser, newPassword) {
-    let emailHelper = new EmailHelper();
+    try {
+      let emailHelper = new EmailHelper();
+      let emailTemplateName = "password-reset";
+      let sender = "Black Swan HR";
 
-    return await emailHelper.sendEmail();
+      let emailTemplate = await EmailHelper.getEmailTemplate(emailTemplateName);
+
+      let replacedEmailContent = await EmailHelper.changeEmailTemplateContent(
+        emailTemplate[0].emailContent,
+        appUser[0].userName,
+        newPassword,
+        sender
+      );
+
+      let mailOptions = {
+        from: "hello@tamasmezo.com",
+        to: "mezotamas0612@gmail.com",
+        subject: emailTemplate[0].emailSubject,
+        text: replacedEmailContent
+      };
+
+      return await emailHelper.sendEmail(mailOptions);
+    } catch (error) {
+      console.log(error, "error during password reset");
+      return new dataResponse(
+        dataResponse.dataResponseType.FAILED,
+        "password reset unsuccessful"
+      );
+    }
   }
 }
 

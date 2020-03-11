@@ -1,13 +1,9 @@
 import nodemailer from "nodemailer";
+import EmailTemplate from "../models/EmailTemplate";
 
 class EmailHelper {
   constructor() {
-    this.mailOption = {
-      from: "hello@tamasmezo.com",
-      to: "mezotamas0612@gmail.com",
-      subject: "Password Reset",
-      text: `Your new password: 1211 Please change it after log in!`
-    };
+    this.mailOption = {};
     this.transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -17,14 +13,39 @@ class EmailHelper {
     });
   }
 
-  sendEmail() {
-    this.transporter.sendMail(this.mailOption, (err, data) => {
-      if (err) {
-        console.log("Error in pwd reset", err);
-      } else {
-        console.log("email sent");
-        return data;
-      }
+  static async getEmailTemplate(emailTemplateName) {
+    try {
+      let emailTemplate = await EmailTemplate.find({
+        emailCustomName: emailTemplateName
+      });
+      return emailTemplate;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  static changeEmailTemplateContent(emailTemplate, name, data, sender) {
+    let content;
+    if (!emailTemplate) {
+      return;
+    }
+    content = emailTemplate.replace(/{sender}/g, sender);
+    content = emailTemplate.replace(/{name}/g, name);
+    content = emailTemplate.replace(/{password}/g, data);
+
+    return content;
+  }
+
+  async sendEmail(mailOptions) {
+    this.mailOption = mailOptions;
+    return new Promise((res, rej) => {
+      this.transporter.sendMail(this.mailOption, (error, info) => {
+        if (error) {
+          res(error);
+          console.log(error);
+        }
+        res(true);
+      });
     });
   }
 }

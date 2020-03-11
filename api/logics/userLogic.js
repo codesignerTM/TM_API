@@ -9,6 +9,7 @@ class UserLogic {
         userName: req.body.username,
         first_name: req.body.first_name,
         last_name: req.body.last_name,
+        tasks: req.body.tasks || [],
         isActive: true,
         storeTime: moment()
       });

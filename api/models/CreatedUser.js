@@ -7,6 +7,7 @@ let UserSchema = new Schema(
     first_name: { type: String, required: true },
     last_name: { type: String, required: true },
     isActive: { type: Boolean, required: true },
+    tasks: { type: Array, default: [] },
     storeTime: { type: String, required: true }
   },
   {

@@ -1,5 +1,6 @@
 import dataResponse from "../models/DataResponse";
 import AppUser from "../models/AppUser";
+import MongoLog from "../models/MongoLog";
 import bcrypt from "bcrypt";
 import moment from "moment";
 import jwt from "jsonwebtoken";
@@ -29,6 +30,15 @@ class AuthLogic {
       };
 
       let userResposeData = await this.createUserToken(userData);
+
+      let mongoLog = new MongoLog({
+        logTitle: "signUp successfull",
+        logLevel: 1,
+        logOwner: "admin",
+        logType: 1,
+        logDataObj: req.body.fullName
+      });
+      await mongoLog.save();
 
       return new dataResponse(
         dataResponse.dataResponseType.SUCCESS,
@@ -155,11 +165,22 @@ class AuthLogic {
       );
 
       let mailOptions = {
-        from: "hello@tamasmezo.com",
-        to: "mezotamas0612@gmail.com",
+        from: process.env.GMAIL_ACC,
+        to: appUser[0].userEmail,
         subject: emailTemplate[0].emailSubject,
         text: replacedEmailContent
       };
+
+      console.log("mailOptions", mailOptions);
+
+      let mongoLog = new MongoLog({
+        logTitle: "password reset email sent",
+        logLevel: 1,
+        logOwner: "admin",
+        logType: 1,
+        logDataObj: appUser.userName
+      });
+      await mongoLog.save();
 
       return await emailHelper.sendEmail(mailOptions);
     } catch (error) {

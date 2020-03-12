@@ -163,24 +163,30 @@ class TaskLogic {
   }
 
   static async resetTaskStatus() {
-    //Setup a scheduled job to check all tasks in the Database - those that have a status of "pending" and next_execute_date_time has passed -
-    //print it to the console and update the task to "done".
-
     let allUsers = await User.find();
     let now = moment();
-    console.log("now", now);
     let pendingStatus = "pending";
 
-    let tasksToUpdate = [];
     for (let key in allUsers) {
+      let selectedUser = allUsers[key];
       let userTasks = allUsers[key].tasks;
-      console.log("userTasks", userTasks);
-      userTasks.map(task => {
+      userTasks.map(async task => {
         if (task.status === pendingStatus && moment(task.deadline) < now) {
-          console.log("task.deadline", moment(task.deadline));
-          task.status = "done";
+          let index = userTasks.indexOf(task);
+          let fieldToUpdate = `tasks.${index}.status`;
+
+          let updatedUser = await User.update(
+            { _id: selectedUser._id },
+            {
+              $set: {
+                [fieldToUpdate]: "done"
+              }
+            },
+            {
+              useFindAndModify: false
+            }
+          );
         }
-        console.log("task", task);
         return task;
       });
     }

@@ -1,5 +1,6 @@
 import dataResponse from "../models/DataResponse";
 import User from "../models/CreatedUser";
+import MongoLog from "../models/MongoLog";
 import nanoid from "nanoid";
 import moment from "moment";
 
@@ -175,7 +176,7 @@ class TaskLogic {
           let index = userTasks.indexOf(task);
           let fieldToUpdate = `tasks.${index}.status`;
 
-          let updatedUser = await User.update(
+          let updatedUser = await User.updateOne(
             { _id: selectedUser._id },
             {
               $set: {
@@ -186,6 +187,15 @@ class TaskLogic {
               useFindAndModify: false
             }
           );
+
+          let mongoLog = new MongoLog({
+            logTitle: "Task status updated",
+            logLevel: 1,
+            logOwner: "cronjob",
+            logType: 1,
+            logDataObj: selectedUser._id
+          });
+          await mongoLog.save();
         }
         return task;
       });

@@ -41,7 +41,7 @@ class UserLogic {
 
       return new dataResponse(
         dataResponse.dataResponseType.SUCCESS,
-        userToUpdate
+        "user updated"
       );
     } catch (error) {
       console.log(error, "error during user update");
@@ -69,6 +69,12 @@ class UserLogic {
     let id = req.params.id;
     try {
       let user = await User.findById({ _id: id });
+      if (!user) {
+        return new dataResponse(
+          dataResponse.dataResponseType.FAILED,
+          "user not found"
+        );
+      }
       return new dataResponse(dataResponse.dataResponseType.SUCCESS, user);
     } catch (error) {
       console.log(error, "error during loading users");

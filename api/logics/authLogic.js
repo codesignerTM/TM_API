@@ -171,8 +171,6 @@ class AuthLogic {
         text: replacedEmailContent
       };
 
-      console.log("mailOptions", mailOptions);
-
       let mongoLog = new MongoLog({
         logTitle: "password reset email sent",
         logLevel: 1,

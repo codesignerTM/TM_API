@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import ImageUser from "../models/UsersWithImage";
 
 class StreamsLogic {
   static readStreamTask(req) {
@@ -90,6 +91,21 @@ class StreamsLogic {
 
   static readUploadedFile(req) {
     let file = req.body.file;
+  }
+
+  static uploadFile(req) {
+    console.log("req", req);
+    let firstName = req.body.firstName;
+    let lastName = req.body.lastName;
+    let image = fs.readFileSync(req.file.path);
+
+    let userWithImage = new ImageUser({
+      firstName: firstName,
+      lastName: lastName,
+      image: image
+    });
+
+    userWithImage.save();
   }
 }
 

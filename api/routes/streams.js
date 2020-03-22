@@ -1,4 +1,7 @@
 import streamController from "../controllers/stream";
+import multer from "multer";
+
+const upload = multer({ dest: "uploads/" });
 
 export default app => {
   app.post("/read", async function(req, res, next) {
@@ -17,7 +20,7 @@ export default app => {
     await streamController.appendToFile(req, res);
   });
 
-  app.post("/upload", async function(req, res, next) {
-    await streamController.readUploadedFile(req, res);
+  app.post("/upload", upload.single("image"), async function(req, res, next) {
+    await streamController.uploadFile(req, res);
   });
 };

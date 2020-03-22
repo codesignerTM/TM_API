@@ -87,6 +87,10 @@ class StreamsLogic {
 
     return file;
   }
+
+  static readUploadedFile(req) {
+    let file = req.body.file;
+  }
 }
 
 export default StreamsLogic;

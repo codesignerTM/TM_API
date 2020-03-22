@@ -24,9 +24,16 @@ const appendToFile = async (req, res) => {
   return;
 };
 
+const readUploadedFile = async (req, res) => {
+  let response = await streamsLogic.readUploadedFile(req, res);
+  res.json(response);
+  return;
+};
+
 export default {
   readFile,
   writeFile,
   pipeStreams,
-  appendToFile
+  appendToFile,
+  readUploadedFile
 };

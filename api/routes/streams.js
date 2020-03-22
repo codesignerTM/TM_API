@@ -16,4 +16,8 @@ export default app => {
   app.post("/append", async function(req, res, next) {
     await streamController.appendToFile(req, res);
   });
+
+  app.post("/upload", async function(req, res, next) {
+    await streamController.readUploadedFile(req, res);
+  });
 };

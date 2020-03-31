@@ -1,4 +1,7 @@
 import dataResponse from "../models/DataResponse";
+import RandomCharGenerator from "../helpers/RandomCharGen";
+import fs from "fs";
+import path from "path";
 import User from "../models/CreatedUser";
 import xlsx from "xlsx";
 import { google } from "googleapis";
@@ -14,7 +17,8 @@ class ExportLogic {
         [
           "https://www.googleapis.com/auth/spreadsheets",
           "https://www.googleapis.com/auth/drive",
-          "https://www.googleapis.com/auth/drive.file"
+          "https://www.googleapis.com/auth/drive.file",
+          "https://www.googleapis.com/auth/drive.metadata"
         ]
       );
 
@@ -23,7 +27,6 @@ class ExportLogic {
           console.log("error during spreadsheet auth", err);
           return;
         } else {
-          console.log(" auth successfull");
           this.writeToSpeadSheet(client);
         }
       });
@@ -70,9 +73,104 @@ class ExportLogic {
         if (err) {
           console.log("err", err);
         } else {
-          console.log("cells updated", result.totalUpdatedCells);
+          console.log("cells updated", result.data.totalUpdatedCells);
+          this.downloadSpreadSheet(spreadsheetId, client);
+          this.readSpreadSheet(spreadsheetId, client);
         }
       }
+    );
+  }
+
+  static async downloadSpreadSheet(spreadsheetId, client) {
+    const gsApiV3 = google.drive({
+      version: "v3",
+      client: client
+    });
+
+    let fileName = await RandomCharGenerator.RandomCharGenerator(5);
+    let filePath = path.join(__dirname + "../../exports/" + fileName + ".xls");
+    //let filePath = process.env.TEMP_LIB + "/" + fileName;
+    let writeStream = fs.createWriteStream(filePath);
+
+    let fileToExport = await gsApiV3.files.export(
+      {
+        fileId: "1RghNnjdE1dUrGb9Pi2W1fZe-4I-DfO7bQjLmhy3Jyfk",
+        mimeType:
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      },
+      {
+        responseType: "stream"
+      },
+      (err, res) => {
+        if (err) {
+          console.log("error", err);
+          return;
+        } else {
+          console.log("res", res);
+          res.pipe(writeStream);
+        }
+      }
+      /*  {
+        responseType: "stream"
+      },
+      (err, response) => {
+        if (err) {
+          console.log("error", err);
+          return;
+        }
+        console.log("responses", response);
+        response.data
+          .on("error", err => {
+            console.log("err", err);
+          })
+          .on("end", () => {
+            console.log("end");
+          })
+          .pipe(writeStream);
+      } */
+    );
+  }
+
+  static async readSpreadSheet(spreadsheetId, client) {
+    const gsApi = google.sheets({
+      version: "v4",
+      auth: client
+    });
+
+    const option = {
+      spreadsheetId: spreadsheetId,
+      range: "Data!A1:G3"
+    };
+
+    //getting data from the spreadsheet
+    let data = await gsApi.spreadsheets.values.get(option);
+    let dataArray = data.data.values;
+    console.log("dataArray", dataArray);
+
+    //handelning blank cells
+    /*   let processedDataArray = dataArray.map(data => {
+      data.push(data[0] + " - " + data[1]);
+      return data;
+    }); */
+    let newData = [
+      ["Bell", "Ms", "Los Angeles", "123456", "123456", "Ring bell"]
+    ];
+
+    let newDataArray = dataArray.concat(newData);
+    console.log("newDataArray", newDataArray);
+
+    //update spreadsheet
+    const writeOption = {
+      spreadsheetId: spreadsheetId,
+      range: "Data!A1",
+      valueInputOption: "USER_ENTERED",
+      resource: {
+        values: newDataArray
+      }
+    };
+
+    let updatedSpreadSheet = await gsApi.spreadsheets.values.update(
+      writeOption
     );
   }
 

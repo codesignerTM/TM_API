@@ -30,6 +30,7 @@
     "nanoid": "^2.1.11",
     "nodemailer": "^6.4.5",
     "rimraf": "^2.6.3",
+    "tmp": "^0.1.0",
     "uuid": "^7.0.2",
     "xlsx": "^0.15.6",
     "xlsx-parse-json": "^3.1.0"

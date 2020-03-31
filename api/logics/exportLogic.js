@@ -145,7 +145,6 @@ class ExportLogic {
     //getting data from the spreadsheet
     let data = await gsApi.spreadsheets.values.get(option);
     let dataArray = data.data.values;
-    console.log("dataArray", dataArray);
 
     //handelning blank cells
     /*   let processedDataArray = dataArray.map(data => {
@@ -157,7 +156,6 @@ class ExportLogic {
     ];
 
     let newDataArray = dataArray.concat(newData);
-    console.log("newDataArray", newDataArray);
 
     //update spreadsheet
     const writeOption = {
@@ -174,7 +172,56 @@ class ExportLogic {
     );
   }
 
-  static async exportXls(req) {}
+  static async createSpreadSheet(client, companyId) {
+    const gsApi = google.sheets({
+      version: "v4",
+      auth: client
+    });
+    const resource = {
+      properties: {
+        title: companyId
+      }
+    };
+    let createdSpreadSheet = await gsApi.spreadsheets.create(
+      {
+        resource,
+        fields: "spreadsheetId"
+      },
+      (err, spreadsheet) => {
+        if (err) {
+          // Handle error.
+          console.log(err);
+        } else {
+          console.log(`Spreadsheet ID: ${spreadsheet.spreadsheetId}`);
+        }
+      }
+    );
+    console.log(`createdSpreadSheet: ${createdSpreadSheet}`);
+  }
+
+  static async exportXls(req) {
+    const createdUsers = await User.find();
+    let id = await RandomCharGenerator.RandomCharGenerator(6);
+    let fileName = id + "-export.xls";
+    let filePath = path.join(__dirname + "../../exports/" + fileName);
+
+    let dataArray = [];
+
+    createdUsers.map(user => {
+      let processedData = [];
+      let firstName = user.first_name;
+      let lastName = user.last_name;
+      let userName = user.userName;
+      let storeTime = storeTime;
+      processedData.push(firstName, lastName, userName, storeTime);
+      return dataArray.push(processedData);
+    });
+
+    let formedData = xlsx.utils.aoa_to_sheet(dataArray);
+    let newWorkBook = xlsx.utils.book_new();
+    xlsx.utils.book_append_sheet(newWorkBook, formedData, "Exported Data");
+    xlsx.writeFile(newWorkBook, filePath);
+  }
 }
 
 export default ExportLogic;

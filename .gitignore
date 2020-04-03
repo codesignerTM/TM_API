@@ -7,3 +7,4 @@ yarn.lock
 GS_Credentials.json
 exports
 /exports/
+/uploads/

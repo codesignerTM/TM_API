@@ -1,9 +1,9 @@
-# BSwan_API
-Small API project
+# TM_API
+## Small API project
 Features:
   - authentication: 
-    -sign up
-    -login
+    - sign up
+    - login
     - password reset
   - creating collections
   - creating instances
@@ -12,7 +12,9 @@ Features:
   - updating DB data
   - cronjob
   - logging events
-  - sending email
-  
-  
+  - sending emails (nodemailer)
+  - streams 
+  - excel export (sheet.js)
+  - google sheets API
+  - google drive API
     

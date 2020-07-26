@@ -1,5 +1,5 @@
-# TM_API
-## Small API project
+# Express & NodeJS starter with basic functionalities
+## Small API project ES6
 Features:
   - authentication: 
     - sign up
